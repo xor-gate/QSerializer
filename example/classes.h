@@ -110,6 +110,8 @@ class TestXml : public QSerializer{
 class DynamicConfig : public QSerializer {
 	Q_GADGET
 	QS_SERIALIZABLE
+public:
+	virtual ~DynamicConfig() {}
 };
 
 class DynamicConfigA : public DynamicConfig {
@@ -129,6 +131,12 @@ class DynamicExportElement : public QSerializer {
 	QS_SERIALIZABLE
 	QS_FIELD(QString, type)
 	public:
+		~DynamicExportElement() {
+			if (config) {
+				delete config;
+				config = nullptr;
+			}
+		}
 		DynamicConfig *config;
 };
 

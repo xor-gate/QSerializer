@@ -38,7 +38,7 @@ void json_example() {
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+//    QCoreApplication a(argc, argv);
     qDebug()<<"====================================SERIALIZE EXAMPLES====================================";
 
     json_example();
