@@ -107,6 +107,76 @@ class TestXml : public QSerializer{
     QS_OBJECT(TestXmlObject, object)
 };
 
+class DynamicConfig : public QSerializer {
+	Q_GADGET
+	QS_SERIALIZABLE
+};
 
+class DynamicConfigA : public DynamicConfig {
+	Q_GADGET
+	QS_SERIALIZABLE
+	QS_FIELD(QString, stringA)
+};
+
+class DynamicConfigB : public DynamicConfig {
+	Q_GADGET
+	QS_SERIALIZABLE
+	QS_FIELD(QString, stringB)
+};
+
+class DynamicExportElement : public QSerializer {
+	Q_GADGET
+	QS_SERIALIZABLE
+	QS_FIELD(QString, type)
+	public:
+		DynamicConfig *config;
+};
+
+class DynamicRoot : public QSerializer {
+	Q_GADGET
+	QS_SERIALIZABLE
+    Q_PROPERTY(QJsonValue exports READ get_json_exports WRITE set_json_exports)
+	public:
+		QList<DynamicExportElement> exports;
+    private:                                                                                
+        QJsonValue get_json_exports() const {                                                
+            QJsonArray val;                                                                 
+            for(int i = 0; i < exports.size(); i++) {
+				const auto item = exports.at(i);
+				auto jsonItem = item.toJson();
+				if (item.type == "A") {
+					auto config = dynamic_cast<const DynamicConfigA *>(item.config);
+					jsonItem["config"] = config->toJson();
+				} else if (item.type == "B") {
+					auto config = dynamic_cast<const DynamicConfigB *>(item.config);
+					jsonItem["config"] = config->toJson();
+				}
+				val.append(jsonItem);
+			}
+            return QJsonValue::fromVariant(val);                                            
+        }                                                                                   
+        void set_json_exports(const QJsonValue & varname) {                                  
+            if(!varname.isArray())                                                          
+                return;                                                                     
+            exports.clear();                                                                   
+            QJsonArray val = varname.toArray();                                             
+            for(int i = 0; i < val.size(); i++) {                                           
+                DynamicExportElement tmp; 
+                tmp.fromJson(val.at(i)); 
+
+				if (tmp.type == "A") {
+					auto config = new DynamicConfigA();
+					config->fromJson(val.at(i)["config"]);
+					tmp.config = config;
+				} else if (tmp.type == "B") {
+					auto config = new DynamicConfigB();
+					config->fromJson(val.at(i)["config"]);
+					tmp.config = config;
+				}
+
+                exports.append(tmp);                                                           
+            }                                                                               
+        }                                                                                   
+};
 
 #endif // CLASSES_H
