@@ -4,6 +4,46 @@
 #include <QQueue>
 #include <QStack>
 
+#ifdef QS_HAS_JSON
+#define QS_JSON_VALUE(type, name) \
+public: \
+    QS_DECLARE_MEMBER(type, name) \
+    Q_PROPERTY(QJsonValue name READ GET(json, name) WRITE SET(json, name))                  \
+    private:                                                                                \
+    QJsonValue GET(json, name)() const {                                                    \
+        auto val = name.toJson();                                                    \
+        return val;                                                             \
+}                                                                                       \
+    void SET(json, name)(const QJsonValue & varname) {                                      \
+        name.fromJson(varname);                                                             \
+    }
+#else
+#define QS_JSON_VALUE(type, name)
+#endif
+
+class MyString : public QString {
+public:
+    using QString::QString;
+
+    QJsonValue toJson(void) const {
+        return QJsonValue(static_cast<const QString&>(*this));
+    }
+
+    void fromJson(const QJsonValue & varname) {
+        if (!varname.isString()) {
+            return;
+        }
+        static_cast<QString &>(*this).assign(varname.toString());
+    }
+};
+
+class MyObject : public QSerializer
+{
+    Q_GADGET
+    QS_SERIALIZABLE
+    QS_FIELD(int, test)
+};
+
 class Parent : public QSerializer{
     Q_GADGET
     QS_SERIALIZABLE
@@ -16,6 +56,8 @@ class Parent : public QSerializer{
     QS_FIELD(int, age)
     QS_FIELD(QString, name)
     QS_FIELD(bool, male)
+    QS_JSON_VALUE(MyString, boembats)
+    QS_JSON_VALUE(MyObject, testobject)
 };
 
 class Student : public QSerializer {

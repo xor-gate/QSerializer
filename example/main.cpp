@@ -16,6 +16,9 @@ void json_example() {
     mother.age = 43;
     mother.male = false;
     mother.name = "Olga";
+    mother.boembats = "JOW";
+
+    QString test = mother.boembats;
 
     Parent father;
     father.age = 48;
@@ -237,8 +240,8 @@ int main(int argc, char *argv[])
     json_example();
 #endif
 
-    serialize_to_file();
-    deserialize_from_file();
+    //serialize_to_file();
+    //deserialize_from_file();
     qDebug() << "=============================================================================";
 
 	return 0;
