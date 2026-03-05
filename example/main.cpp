@@ -16,9 +16,9 @@ void json_example() {
     mother.age = 43;
     mother.male = false;
     mother.name = "Olga";
-    mother.boembats = "JOW";
+    mother.boembats = QDateTime::currentDateTime();
 
-    QString test = mother.boembats;
+    //QString test = mother.boembats;
 
     Parent father;
     father.age = 48;

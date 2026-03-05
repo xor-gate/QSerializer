@@ -3,11 +3,11 @@
 #include <QSerializer>
 #include <QQueue>
 #include <QStack>
+#include <QDate>
 
 #ifdef QS_HAS_JSON
 #define QS_JSON_VALUE(type, name) \
 public: \
-    QS_DECLARE_MEMBER(type, name) \
     Q_PROPERTY(QJsonValue name READ GET(json, name) WRITE SET(json, name))                  \
     private:                                                                                \
     QJsonValue GET(json, name)() const {                                                    \
@@ -21,27 +21,39 @@ public: \
 #define QS_JSON_VALUE(type, name)
 #endif
 
-class MyString : public QString {
+#define QS_BIND_VALUE(type, name) \
+    QS_JSON_VALUE(type, name)
+
+#define QS_VALUE(type, name) \
+    QS_DECLARE_MEMBER(type, name)                                                           \
+    QS_BIND_VALUE(type, name)
+
+class CustomDateTime : public QDateTime {
 public:
-    using QString::QString;
+    using QDateTime::QDateTime;
+
+    // Assignment Operator
+    CustomDateTime& operator=(const QDateTime& other) {
+        // 1. Guard against self-assignment
+        if (this != &other) {
+            // 2. Explicitly call the base class assignment operator
+            QDateTime::operator=(other);
+        }
+
+        // 4. Return *this to allow chained assignments (a = b = c)
+        return *this;
+    }
 
     QJsonValue toJson(void) const {
-        return QJsonValue(static_cast<const QString&>(*this));
+        return QJsonValue(static_cast<const QDateTime&>(*this).toString(Qt::ISODateWithMs));
     }
 
     void fromJson(const QJsonValue & varname) {
         if (!varname.isString()) {
             return;
         }
-        static_cast<QString &>(*this).assign(varname.toString());
+        static_cast<QDateTime &>(*this) = QDateTime::fromString(varname.toString(), Qt::ISODateWithMs);
     }
-};
-
-class MyObject : public QSerializer
-{
-    Q_GADGET
-    QS_SERIALIZABLE
-    QS_FIELD(int, test)
 };
 
 class Parent : public QSerializer{
@@ -56,8 +68,7 @@ class Parent : public QSerializer{
     QS_FIELD(int, age)
     QS_FIELD(QString, name)
     QS_FIELD(bool, male)
-    QS_JSON_VALUE(MyString, boembats)
-    QS_JSON_VALUE(MyObject, testobject)
+    QS_VALUE(CustomDateTime, boembats)
 };
 
 class Student : public QSerializer {
