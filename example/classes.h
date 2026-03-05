@@ -28,7 +28,7 @@ public: \
     QS_DECLARE_MEMBER(type, name)                                                           \
     QS_BIND_VALUE(type, name)
 
-class CustomDateTime : public QDateTime {
+class CustomDateTime : public QSerializerValue, public QDateTime {
 public:
     using QDateTime::QDateTime;
 
