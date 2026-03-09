@@ -5,42 +5,16 @@
 #include <QStack>
 #include <QDate>
 
-#ifdef QS_HAS_JSON
-#define QS_JSON_VALUE(type, name) \
-public: \
-    Q_PROPERTY(QJsonValue name READ GET(json, name) WRITE SET(json, name))                  \
-    private:                                                                                \
-    QJsonValue GET(json, name)() const {                                                    \
-        auto val = name.toJson();                                                    \
-        return val;                                                             \
-}                                                                                       \
-    void SET(json, name)(const QJsonValue & varname) {                                      \
-        name.fromJson(varname);                                                             \
-    }
-#else
-#define QS_JSON_VALUE(type, name)
-#endif
-
-#define QS_BIND_VALUE(type, name) \
-    QS_JSON_VALUE(type, name)
-
-#define QS_VALUE(type, name) \
-    QS_DECLARE_MEMBER(type, name)                                                           \
-    QS_BIND_VALUE(type, name)
-
 class CustomDateTime : public QSerializerValue, public QDateTime {
 public:
+    static const Qt::DateFormat fmt = Qt::ISODateWithMs;
     using QDateTime::QDateTime;
 
-    // Assignment Operator
     CustomDateTime& operator=(const QDateTime& other) {
-        // 1. Guard against self-assignment
         if (this != &other) {
-            // 2. Explicitly call the base class assignment operator
             QDateTime::operator=(other);
         }
 
-        // 4. Return *this to allow chained assignments (a = b = c)
         return *this;
     }
 
@@ -52,7 +26,21 @@ public:
         if (!varname.isString()) {
             return;
         }
-        static_cast<QDateTime &>(*this) = QDateTime::fromString(varname.toString(), Qt::ISODateWithMs);
+        static_cast<QDateTime &>(*this) = QDateTime::fromString(varname.toString(), CustomDateTime::fmt);
+    }
+
+    void fromXml(const QString & val)
+    {
+        if (val.isNull()) {
+            return;
+        }
+        static_cast<QDateTime &>(*this) = QDateTime::fromString(val, CustomDateTime::fmt);
+    }
+
+    QString toXml(void) const
+    {
+        auto value = static_cast<const QDateTime&>(*this).toString(CustomDateTime::fmt);
+        return value;
     }
 };
 
@@ -60,15 +48,19 @@ class Parent : public QSerializer{
     Q_GADGET
     QS_SERIALIZABLE
     public:
-    Parent(){ }
+    Parent() {
+        created_at = QDateTime::currentDateTime();
+    }
     Parent(int age, const QString & name, bool isMale)
         : age(age),
           name(name),
-          male(isMale) { }
+          male(isMale) {
+        created_at = QDateTime::currentDateTime();
+    }
     QS_FIELD(int, age)
     QS_FIELD(QString, name)
     QS_FIELD(bool, male)
-    QS_VALUE(CustomDateTime, boembats)
+    QS_VALUE(CustomDateTime, created_at)
 };
 
 class Student : public QSerializer {

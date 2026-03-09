@@ -16,7 +16,6 @@ void json_example() {
     mother.age = 43;
     mother.male = false;
     mother.name = "Olga";
-    mother.boembats = QDateTime::currentDateTime();
 
     //QString test = mother.boembats;
 
@@ -240,8 +239,8 @@ int main(int argc, char *argv[])
     json_example();
 #endif
 
-    //serialize_to_file();
-    //deserialize_from_file();
+    serialize_to_file();
+    deserialize_from_file();
     qDebug() << "=============================================================================";
 
 	return 0;

@@ -8,16 +8,18 @@ Download repository
 $ git clone https://github.com/smurfomen/QSerializer.git
 ```
 Just include qserializer.h in your project and enjoy simple serialization. qserializer.h located in src folder.
-Set compiler define `QS_HAS_JSON` or `QS_HAS_XML` for enabling support for xml or json. Enable both at the same time
-[is not supported](https://github.com/smurfomen/QSerializer/issues/7).
+Set compiler define `QS_HAS_JSON` or `QS_HAS_XML` for enabling support for xml or json.
 
-</br>A demo project for using QSerializer located in example folder.
+</br>A demo project for using QSerializer located in [`example`](/example) folder.
 
 ## Workflow
 To get started, include qserializer.h in your code.
 ## Create serialization class
+
 For create serializable member of class and generate propertyes, use macro:
+
 - __QS_FIELD__
+- __QS_VALUE__
 - __QS_COLLECTION__
 - __QS_OBJECT__
 - __QS_COLLECTION_OBJECTS__
@@ -27,6 +29,7 @@ For create serializable member of class and generate propertyes, use macro:
 - __QS_STL_DICT_OBJECTS__
 
 If you want only declare exists fields - use macro QS_JSON_FIELD, QS_XML_FIELD, QS_JSON_COLLECTION and other (look at qserializer.h)
+
 ### Inherit from QSerializer
 Inherit from QSerializer, use macro QS_SERIALIZABLE or override metaObject method and declare some serializable fields.</br>
 In this case you must use Q_GADGET in your class.
@@ -87,12 +90,14 @@ QByteArray rawXml;
 u.fromXml(rawXml);
 ```
 ## Macro description
+
 | Macro                 | Description                                                  |
 | --------------------- | ------------------------------------------------------------ |
-| QSERIALIZABLE         | Make class or struct is serializable to QSerializer (override QMetaObject method and define Q_GADGET macro)                             |
+| QSERIALIZABLE         | Make class or struct serializable to QSerializer (override QMetaObject method and define Q_GADGET macro)                             |
 | QS_FIELD              | Create serializable simple field                             |
+| QS_VALUE              | Create serializable inner custom primitive value type        |
 | QS_COLLECTION         | Create serializable collection values of primitive types     |
-| QS_OBJECT             | Create serializable inner custom type object                 |
+| QS_OBJECT             | Create serializable inner custom object type                 |
 | QS_COLLECTION_OBJECTS | Create serializable collection of custom type objects        |
 | QS_QT_DICT            | Create serializable dictionary of primitive type values FOR QT DICTIONARY TYPES |
 | QS_QT_DICT_OBJECTS    | Create serializable dictionary of custom type values FOR QT DICTIONARY TYPES |
