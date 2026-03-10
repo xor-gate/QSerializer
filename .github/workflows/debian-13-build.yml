@@ -40,7 +40,8 @@ jobs:
 
       - name: Run example
         run: |
-          cd build/example && ./QSerializeExample
+          cd build/example
+          ./QSerializeExample
 
       # Benchmarks
       # NOTE: Broken build, last change 6 years ago (API break)
