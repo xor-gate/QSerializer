@@ -25,8 +25,9 @@ jobs:
             libgl1-mesa-dev \
             make
 
-      - name: Create build Directories
-        run: mkdir -p build/{benchmarks,example}
+      - name: Create build directories
+        run: | 
+          mkdir -p build/example
 
       # Example
       - name: Run qmake on example
