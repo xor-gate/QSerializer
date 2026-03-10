@@ -3,17 +3,22 @@ This project is designed to convert data from an object view to JSON or XML and 
 An important feature of the QSerializer is the ability to specify serializable fields of the class without having to serialize the entire class. QSerilaizer generate code and declare `Q_PROPERTY` for every declared member of class. This is convenient because you do not need to create separate structures or classes for serialization of write some code to serialize every class, it's just included to QSerializer.
 
 ## Installation
+
 Download repository
+
 ```bash
 $ git clone https://github.com/smurfomen/QSerializer.git
 ```
-Just include qserializer.h in your project and enjoy simple serialization. qserializer.h located in src folder.
+
+Just include `QSerializer in your project and enjoy simple serialization. qserializer.h located in src folder.
 Set compiler define `QS_HAS_JSON` or `QS_HAS_XML` for enabling support for xml or json.
 
 </br>A demo project for using QSerializer located in [`example`](/example) folder.
 
 ## Workflow
-To get started, include qserializer.h in your code.
+
+To get started, `#include "QSerializer" in your code.
+
 ## Create serialization class
 
 For create serializable member of class and generate propertyes, use macro:
@@ -28,7 +33,7 @@ For create serializable member of class and generate propertyes, use macro:
 - __QS_STL_DICT__
 - __QS_STL_DICT_OBJECTS__
 
-If you want only declare exists fields - use macro QS_JSON_FIELD, QS_XML_FIELD, QS_JSON_COLLECTION and other (look at qserializer.h)
+If you want only declare exists fields - use macro `QS_JSON_FIELD`, QS_XML_FIELD, `QS_JSON_COLLECTION` and other (look at qserializer.hpp)
 
 ### Inherit from QSerializer
 Inherit from QSerializer, use macro QS_SERIALIZABLE or override metaObject method and declare some serializable fields.</br>
@@ -94,8 +99,8 @@ u.fromXml(rawXml);
 | Macro                 | Description                                                  |
 | --------------------- | ------------------------------------------------------------ |
 | QSERIALIZABLE         | Make class or struct serializable to QSerializer (override QMetaObject method and define Q_GADGET macro)                             |
-| QS_FIELD              | Create serializable simple field                             |
-| QS_VALUE              | Create serializable inner custom primitive value type        |
+| QS_FIELD              | Create serializable simple field (based on QVariant)         |
+| QS_VALUE              | Create serializable inner custom primitive value type (based on to/from Xml/Json custom methods) |
 | QS_COLLECTION         | Create serializable collection values of primitive types     |
 | QS_OBJECT             | Create serializable inner custom object type                 |
 | QS_COLLECTION_OBJECTS | Create serializable collection of custom type objects        |

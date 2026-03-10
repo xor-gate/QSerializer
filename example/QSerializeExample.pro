@@ -16,7 +16,7 @@ CONFIG -= app_bundle
 DEFINES += QS_HAS_JSON
 DEFINES += QS_HAS_XML
 
-include(../qserializer.pri)
+include(../src/QSerializer.pri)
 
 SOURCES += \
         main.cpp

@@ -1,5 +1,6 @@
 #ifndef CLASSES_H
 #define CLASSES_H
+
 #include <QSerializer>
 #include <QQueue>
 #include <QStack>

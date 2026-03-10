@@ -25,21 +25,32 @@ jobs:
             libgl1-mesa-dev \
             make
 
-      - name: Create Build Directory
-        run: mkdir build
+      - name: Create build Directories
+        run: mkdir -p "build/{benchmarks,example}"
 
-      - name: Run qmake
+      # Example
+      - name: Run qmake on example
         run: |
-          # Use the full path or ensure qmake6 is in PATH
-          cd example
-          qmake6 -o build/Makefile *.pro
+          cd build/example && qmake6 -o ../build/example/Makefile *.pro
 
-      - name: Compile
+      - name: Compile example
         run: |
-          cd example/build
-          make -j$(nproc)
+          cd build/example && make -j$(nproc)
 
-      - name: Run
+      - name: Run example
         run: |
-          cd example/build
-          ./QSerializeExample
+          cd build/example && ./QSerializeExample
+
+      # Benchmarks
+      # NOTE: Broken build, last change 6 years ago (API break)
+      #- name: Run qmake on benchmarks
+      #  run: |
+      #    cd build/benchmarks && qmake6 -o ../build/benchmarks/Makefile *.pro
+
+      #- name: Compile benchmarks
+      #  run: |
+      #    cd build/benchmarks && make -j$(nproc)
+
+      #- name: Run example
+      #  run: |
+      #    cd build/benchmarks && ./benchmarks
