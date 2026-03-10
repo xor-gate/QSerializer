@@ -49,7 +49,7 @@
 #include <type_traits>
 #include <QDebug>
 
-#define QS_VERSION "1.2"
+#define QS_VERSION "1.3"
 
 /* Generate metaObject method */
 #define QS_META_OBJECT_METHOD \
@@ -68,6 +68,54 @@
 Q_DECLARE_METATYPE(QDomNode)
 Q_DECLARE_METATYPE(QDomElement)
 #endif
+
+class QSerializerValue {
+public:
+    virtual ~QSerializerValue() = default;
+
+#ifdef QS_HAS_JSON
+    /*! \brief  Convert QJsonValue in QJsonDocument as QByteArray. */
+    static QByteArray toByteArray(const QJsonValue & value){
+        return QJsonDocument(value.toObject()).toJson();
+    }
+#endif
+
+#ifdef QS_HAS_XML
+    /*! \brief  Convert QDomNode in QDomDocument as QByteArray. */
+    static QByteArray toByteArray(const QDomNode & value) {
+        QDomDocument doc = value.toDocument();
+        return doc.toByteArray();
+    }
+
+    /*! \brief  Make xml processing instruction (hat) and returns new XML QDomDocument. On deserialization procedure all processing instructions will be ignored. */
+    static QDomDocument appendXmlHat(const QDomNode &node, const QString & encoding, const QString & version = "1.0"){
+        QDomDocument doc = node.toDocument();
+        QDomNode xmlNode = doc.createProcessingInstruction("xml", QString("version=\"%1\" encoding=\"%2\"").arg(version).arg(encoding));
+        doc.insertBefore(xmlNode, doc.firstChild());
+        return doc;
+    }
+#endif
+
+#ifdef QS_HAS_JSON
+    /*! \brief  Serialize all accessed JSON propertyes for this object. */
+    virtual QJsonValue toJson() const = 0;
+
+
+    /*! \brief  Returns QByteArray representation this object using json-serialization. */
+    QByteArray toRawJson() const {
+        return toByteArray(toJson());
+    }
+
+    /*! \brief  Deserialize all accessed XML propertyes for this object. */
+    virtual void fromJson(const QJsonValue & val) = 0;
+#endif
+
+#ifdef QS_HAS_XML
+    virtual void fromXml(const QString &val) = 0;                                                                                  \
+
+    virtual QString toXml(void) const = 0;
+#endif
+};
 
 class QSerializer {
     Q_GADGET
@@ -372,6 +420,48 @@ public:
         }                                                                                   
 #else
 #define QS_XML_OBJECT(type, name)
+#endif
+
+/**** TODO ***/
+#ifdef QS_HAS_JSON
+#define QS_JSON_VALUE(type, name) \
+public: \
+    Q_PROPERTY(QJsonValue name READ GET(json, name) WRITE SET(json, name))                  \
+    private:                                                                                \
+    QJsonValue GET(json, name)() const {                                                    \
+        auto val = name.toJson();                                                    \
+        return val;                                                             \
+}                                                                                       \
+    void SET(json, name)(const QJsonValue & varname) {                                      \
+        name.fromJson(varname);                                                             \
+}
+#else
+#define QS_JSON_VALUE(type, name)
+#endif
+
+/**** TODO *****/
+#ifdef QS_HAS_XML
+#define QS_XML_VALUE(type, name)                                                            \
+Q_PROPERTY(QDomNode name READ GET(xml, name) WRITE SET(xml, name))                          \
+    private:                                                                                \
+    QDomNode GET(xml, name)() const {                                                       \
+        QDomDocument doc;                                                                   \
+        QString strname = #name;                                                            \
+        QDomElement element = doc.createElement(strname);                                   \
+        QDomText valueOfProp = doc.createTextNode(name.toXml());                            \
+        element.appendChild(valueOfProp);                                                   \
+        doc.appendChild(element);                                                           \
+        return  QDomNode(doc);                                                              \
+    }                                                                                       \
+    void SET(xml, name)(const QDomNode &node) {                                             \
+        if(!node.isNull() && node.isElement()){                                             \
+            QDomElement domElement = node.toElement();                                      \
+            if(domElement.tagName() == #name)                                               \
+            name.fromXml(domElement.text());                                                \
+    }                                                                                       \
+}
+#else
+#define QS_XML_VALUE(type, name)
 #endif
 
 /* Generate JSON-property and methods for collection of custom type objects */
@@ -745,6 +835,11 @@ public:
     QS_JSON_OBJECT(type, name)                                                              \
     QS_XML_OBJECT(type, name)                                                               \
 
+/***** TODO ****/
+#define QS_BIND_VALUE(type, name)                                                           \
+    QS_JSON_VALUE(type, name)                                                               \
+    QS_XML_VALUE(type, name)                                                                \
+
 /* BIND: */
 /* generate serializable propertyes JSON and XML for collection of custom type objects */
 #define QS_BIND_COLLECTION_OBJECTS(itemType, name)                                          \
@@ -785,6 +880,11 @@ public:
 #define QS_FIELD(type, name)                                                                \
     QS_DECLARE_MEMBER(type, name)                                                           \
     QS_BIND_FIELD(type, name)                                                               \
+
+/*** TODO ****/
+#define QS_VALUE(type, name)                                                                \
+    QS_DECLARE_MEMBER(type, name)                                                           \
+    QS_BIND_VALUE(type, name)                                                               \
 
 /* CREATE AND BIND: */
 /* Make collection of primitive type objects [collectionType<itemType> name] and generate serializable propertyes for this collection */

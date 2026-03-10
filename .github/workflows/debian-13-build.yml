@@ -1,0 +1,58 @@
+# test
+name: Debian 13 Qt Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # This forces the job to run inside a Debian 13 environment
+    container: debian:trixie
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y \
+            build-essential \
+            qt6-base-dev \
+            qt6-base-private-dev \
+            libgl1-mesa-dev \
+            make
+
+      - name: Create build directories
+        run: | 
+          mkdir -p build/example
+
+      # Example
+      - name: Run qmake on example
+        run: |
+          cd build/example && qmake6 -makefile ../../example/*.pro
+
+      - name: Compile example
+        run: |
+          cd build/example && make -j$(nproc)
+
+      - name: Run example
+        run: |
+          cd build/example
+          ./QSerializeExample
+
+      # Benchmarks
+      # NOTE: Broken build, last change 6 years ago (API break)
+      #- name: Run qmake on benchmarks
+      #  run: |
+      #    cd build/benchmarks && qmake6 -o ../build/benchmarks/Makefile *.pro
+
+      #- name: Compile benchmarks
+      #  run: |
+      #    cd build/benchmarks && make -j$(nproc)
+
+      #- name: Run example
+      #  run: |
+      #    cd build/benchmarks && ./benchmarks

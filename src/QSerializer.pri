@@ -3,7 +3,7 @@ contains(DEFINES, QS_HAS_XML) {
 }
 
 HEADERS += \
-        $$PWD/src/qserializer.h
+        $$PWD/qserializer.hpp
 
 INCLUDEPATH += $$PWD/
 

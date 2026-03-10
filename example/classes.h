@@ -1,21 +1,67 @@
 #ifndef CLASSES_H
 #define CLASSES_H
+
 #include <QSerializer>
 #include <QQueue>
 #include <QStack>
+#include <QDate>
+
+class CustomDateTime : public QSerializerValue, public QDateTime {
+public:
+    static const Qt::DateFormat fmt = Qt::ISODateWithMs;
+    using QDateTime::QDateTime;
+
+    CustomDateTime& operator=(const QDateTime& other) {
+        if (this != &other) {
+            QDateTime::operator=(other);
+        }
+
+        return *this;
+    }
+
+    QJsonValue toJson(void) const {
+        return QJsonValue(static_cast<const QDateTime&>(*this).toString(Qt::ISODateWithMs));
+    }
+
+    void fromJson(const QJsonValue & varname) {
+        if (!varname.isString()) {
+            return;
+        }
+        static_cast<QDateTime &>(*this) = QDateTime::fromString(varname.toString(), CustomDateTime::fmt);
+    }
+
+    void fromXml(const QString & val)
+    {
+        if (val.isNull()) {
+            return;
+        }
+        static_cast<QDateTime &>(*this) = QDateTime::fromString(val, CustomDateTime::fmt);
+    }
+
+    QString toXml(void) const
+    {
+        auto value = static_cast<const QDateTime&>(*this).toString(CustomDateTime::fmt);
+        return value;
+    }
+};
 
 class Parent : public QSerializer{
     Q_GADGET
     QS_SERIALIZABLE
     public:
-    Parent(){ }
+    Parent() {
+        created_at = QDateTime::currentDateTime();
+    }
     Parent(int age, const QString & name, bool isMale)
         : age(age),
           name(name),
-          male(isMale) { }
+          male(isMale) {
+        created_at = QDateTime::currentDateTime();
+    }
     QS_FIELD(int, age)
     QS_FIELD(QString, name)
     QS_FIELD(bool, male)
+    QS_VALUE(CustomDateTime, created_at)
 };
 
 class Student : public QSerializer {

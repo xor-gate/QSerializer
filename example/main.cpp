@@ -17,6 +17,8 @@ void json_example() {
     mother.male = false;
     mother.name = "Olga";
 
+    //QString test = mother.boembats;
+
     Parent father;
     father.age = 48;
     father.male = true;

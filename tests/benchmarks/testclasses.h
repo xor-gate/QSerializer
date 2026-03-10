@@ -1,7 +1,7 @@
 #ifndef TESTCLASSES_H
 #define TESTCLASSES_H
 
-#include "../src/qserializer.h"
+#include <QSerializer>
 #include <QObject>
 
 class TestField_int {
