@@ -12,14 +12,19 @@ Download repository
 $ git clone https://github.com/smurfomen/QSerializer.git
 ```
 
-Just include `QSerializer in your project and enjoy simple serialization. qserializer.h located in src folder.
+Just include `QSerializer` in your project and enjoy simple serialization. `qserializer.hpp` located in src folder.
 Set compiler define `QS_HAS_JSON` or `QS_HAS_XML` for enabling support for xml or json.
+
+
 
 </br>A demo project for using QSerializer located in [`example`](/example) folder.
 
 ## Workflow
 
-To get started, `#include "QSerializer" in your code.
+To get started:
+
+- `include(QSerializer/src/QSerializer.pri)` from within qmake `.pro` project file
+- `#include <QSerializer>` in your C++ code
 
 ## Create serialization class
 
