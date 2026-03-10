@@ -32,7 +32,7 @@ jobs:
       # Example
       - name: Run qmake on example
         run: |
-          cd build/example && qmake6 -o ../build/example/Makefile *.pro
+          cd build/example && qmake6 -makefile ../../example/*.pro
 
       - name: Compile example
         run: |
