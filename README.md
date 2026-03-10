@@ -113,9 +113,9 @@ u.fromXml(rawXml);
 
 | Macro                 | Description                                                  |
 | --------------------- | ------------------------------------------------------------ |
-| QSERIALIZABLE         | Make class or struct serializable to QSerializer (override QMetaObject method and define Q_GADGET macro)                             |
-| QS_FIELD              | Create serializable simple field (based on QVariant)         |
-| QS_VALUE              | Create serializable inner custom primitive value type (based on to/from Xml/Json custom methods) |
+| QSERIALIZABLE         | Make class or struct serializable to `QSerializer` (override QMetaObject method and define Q_GADGET macro)                             |
+| QS_FIELD              | Create serializable simple field (based on `QVariant`)         |
+| QS_VALUE              | Create serializable inner custom primitive value type (based on to/from Xml/Json custom methods). Inherit from `QSerializerValue` class |
 | QS_COLLECTION         | Create serializable collection values of primitive types     |
 | QS_OBJECT             | Create serializable inner custom object type                 |
 | QS_COLLECTION_OBJECTS | Create serializable collection of custom type objects        |
